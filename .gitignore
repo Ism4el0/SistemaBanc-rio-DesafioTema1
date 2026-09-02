@@ -1,0 +1,8 @@
+## Visual Studio & .NET Gitignore
+bin/
+obj/
+.vs/
+*.user
+*.userosscache
+*.suo
+*.userprefs
