@@ -1,5 +1,9 @@
 namespace SistemaBancario;
 
+/// <summary>
+/// Representa uma Conta Poupança bancária.
+/// É isenta de taxas para saque e possui a operação de aplicar rendimento sobre o saldo.
+/// </summary>
 public class ContaPoupanca : ContaBancaria
 {
     public ContaPoupanca(int numeroConta, string titular, decimal saldoInicial)
@@ -10,32 +14,35 @@ public class ContaPoupanca : ContaBancaria
     public override bool Sacar(decimal valor)
     {
         if (valor <= 0)
-        {
-            Console.WriteLine("Valor de saque inválido!");
-            return false;
-        }
+            throw new ArgumentException("O valor de saque deve ser maior que zero.");
 
         if (Saldo < valor)
         {
-            Console.WriteLine($"[Conta Poupança {NumeroConta}] Saldo insuficiente! (Tentativa: R$ {valor:F2} | Saldo: R$ {Saldo:F2})");
-            return false;
+            throw new SaldoInsuficienteException(
+                $"Saldo insuficiente na Conta Poupança {NumeroConta}! Tentativa de saque: R$ {valor:F2}. Saldo disponível: R$ {Saldo:F2}.");
         }
 
         Saldo -= valor;
-        Console.WriteLine($"[Conta Poupança {NumeroConta}] Saque de R$ {valor:F2} realizado com sucesso sem taxas!");
         return true;
     }
 
-    public void AplicarRendimento(decimal taxaPercentual)
+    /// <summary>
+    /// Aplica uma taxa percentual de rendimento sobre o saldo atual.
+    /// </summary>
+    public decimal AplicarRendimento(decimal taxaPercentual)
     {
         if (taxaPercentual <= 0)
-        {
-            Console.WriteLine("A taxa de rendimento deve ser maior que zero!");
-            return;
-        }
+            throw new ArgumentException("A taxa de rendimento deve ser maior que zero.");
 
-        decimal rendimento = Saldo * (taxaPercentual / 100);
+        decimal rendimento = Saldo * (taxaPercentual / 100m);
         Saldo += rendimento;
-        Console.WriteLine($"[Conta Poupança {NumeroConta}] Rendimento de {taxaPercentual}% aplicado (+ R$ {rendimento:F2}). Novo Saldo: R$ {Saldo:F2}");
+        return rendimento;
+    }
+
+    public override void ExibirExtrato()
+    {
+        base.ExibirExtrato();
+        Console.WriteLine("Benefício: Isenta de tarifas de saque");
+        Console.WriteLine("------------------------------------------");
     }
 }

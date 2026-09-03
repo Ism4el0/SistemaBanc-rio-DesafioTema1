@@ -1,32 +1,65 @@
 namespace SistemaBancario;
 
+/// <summary>
+/// Classe abstrata base que representa uma conta bancária genérica.
+/// Aplica os conceitos de Abstração, Encapsulamento e base para Herança e Polimorfismo.
+/// </summary>
 public abstract class ContaBancaria
 {
-    public int NumeroConta { get; set; }
+    public int NumeroConta { get; private set; }
     public string Titular { get; set; }
     public decimal Saldo { get; protected set; }
 
     public ContaBancaria(int numeroConta, string titular, decimal saldoInicial)
     {
+        if (numeroConta <= 0)
+            throw new ArgumentException("O número da conta deve ser um valor positivo.");
+
+        if (string.IsNullOrWhiteSpace(titular))
+            throw new ArgumentException("O nome do titular é obrigatório.");
+
+        if (saldoInicial < 0)
+            throw new ArgumentException("O saldo inicial não pode ser negativo.");
+
         NumeroConta = numeroConta;
         Titular = titular;
         Saldo = saldoInicial;
     }
 
+    /// <summary>
+    /// Realiza o depósito de um valor na conta.
+    /// </summary>
     public virtual void Depositar(decimal valor)
     {
         if (valor <= 0)
-        {
-            Console.WriteLine("O valor de depósito deve ser positivo!");
-            return;
-        }
+            throw new ArgumentException("O valor de depósito deve ser maior que zero.");
 
         Saldo += valor;
-        Console.WriteLine($"Depósito de R$ {valor:F2} realizado com sucesso na conta {NumeroConta}.");
     }
 
+    /// <summary>
+    /// Método abstrato de saque que deve ser implementado pelas classes derivadas (Polimorfismo).
+    /// </summary>
     public abstract bool Sacar(decimal valor);
 
+    /// <summary>
+    /// Realiza a transferência de um valor para outra conta bancária.
+    /// </summary>
+    public virtual void Transferir(decimal valor, ContaBancaria contaDestino)
+    {
+        if (contaDestino == null)
+            throw new ArgumentNullException(nameof(contaDestino), "Conta de destino não informada.");
+
+        if (contaDestino.NumeroConta == this.NumeroConta)
+            throw new OperacaoBancariaException("A conta de destino não pode ser a mesma conta de origem.");
+
+        Sacar(valor);
+        contaDestino.Depositar(valor);
+    }
+
+    /// <summary>
+    /// Exibe os dados e o saldo da conta no console.
+    /// </summary>
     public virtual void ExibirExtrato()
     {
         Console.WriteLine("------------------------------------------");
