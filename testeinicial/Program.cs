@@ -5,7 +5,7 @@ using SistemaBancario;
 // Define a cultura padrão para formatação e leitura numérica
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
 
-Banco banco = new Banco("ByteBank Nacional");
+Banco banco = new Banco("NuNu Banquinho");
 
 // Inicialização com dados de demonstração
 InicializarDadosDemonstracao(banco);
@@ -14,24 +14,23 @@ bool executando = true;
 
 while (executando)
 {
-    Console.Clear();
+    LimparTela();
     Console.WriteLine("=================================================");
     Console.WriteLine($"       SISTEMA BANCÁRIO - {banco.Nome.ToUpper()}");
     Console.WriteLine("=================================================");
-    Console.WriteLine(" 1. Abrir Nova Conta");
-    Console.WriteLine(" 2. Consultar Extrato de uma Conta");
-    Console.WriteLine(" 3. Realizar Depósito");
-    Console.WriteLine(" 4. Realizar Saque");
-    Console.WriteLine(" 5. Realizar Transferência entre Contas");
-    Console.WriteLine(" 6. Aplicar Rendimento (Conta Poupança)");
-    Console.WriteLine(" 7. Solicitar Empréstimo (Conta Empresarial)");
-    Console.WriteLine(" 8. Listar Todas as Contas (Polimorfismo)");
-    Console.WriteLine(" 9. Relatório de Tributos (Interface ITributavel)");
+    Console.WriteLine(" 1. Acessar Minha Conta");
+    Console.WriteLine(" 2. Abrir Nova Conta");
+    Console.WriteLine(" 3. Listar Todas as Contas");
+    Console.WriteLine(" 4. Relatório de Tributos");
     Console.WriteLine(" 0. Sair");
     Console.WriteLine("=================================================");
     Console.Write("Escolha uma opção: ");
 
     string? opcao = Console.ReadLine();
+    if (opcao == null)
+    {
+        break;
+    }
     Console.WriteLine();
 
     try
@@ -39,30 +38,15 @@ while (executando)
         switch (opcao?.Trim())
         {
             case "1":
-                CadastrarNovaConta(banco);
+                AcessarConta(banco);
                 break;
             case "2":
-                ConsultarExtrato(banco);
+                CadastrarNovaConta(banco);
                 break;
             case "3":
-                RealizarDeposito(banco);
-                break;
-            case "4":
-                RealizarSaque(banco);
-                break;
-            case "5":
-                RealizarTransferencia(banco);
-                break;
-            case "6":
-                AplicarRendimento(banco);
-                break;
-            case "7":
-                SolicitarEmprestimo(banco);
-                break;
-            case "8":
                 ListarContas(banco);
                 break;
-            case "9":
+            case "4":
                 ExibirRelatorioTributos(banco);
                 break;
             case "0":
@@ -71,7 +55,7 @@ while (executando)
                 break;
             default:
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Opção inválida! Por favor, escolha uma opção entre 0 e 9.");
+                Console.WriteLine("Opção inválida! Por favor, escolha uma opção entre 0 e 4.");
                 Console.ResetColor();
                 break;
         }
@@ -109,8 +93,7 @@ while (executando)
 
     if (executando)
     {
-        Console.WriteLine("\nPressione qualquer tecla para continuar...");
-        Console.ReadKey();
+        AguardarTecla();
     }
 }
 
@@ -119,6 +102,125 @@ static void InicializarDadosDemonstracao(Banco banco)
     banco.AdicionarConta(new ContaCorrente(101, "João Silva", 1500.00m, 5.00m));
     banco.AdicionarConta(new ContaPoupanca(202, "Maria Oliveira", 3000.00m));
     banco.AdicionarConta(new ContaEmpresarial(303, "Tech Solutions Ltda", 10000.00m, 25000.00m));
+}
+
+static void AcessarConta(Banco banco)
+{
+    Console.WriteLine("--- ACESSO À CONTA ---");
+    int numero = LerInteiro("Digite o número da sua conta: ");
+    ContaBancaria conta = banco.BuscarConta(numero);
+
+    MenuContaLogada(banco, conta);
+}
+
+static void MenuContaLogada(Banco banco, ContaBancaria conta)
+{
+    bool logado = true;
+    while (logado)
+    {
+        LimparTela();
+        Console.WriteLine("=================================================");
+        Console.WriteLine($"  CONTA: {conta.NumeroConta} | TITULAR: {conta.Titular.ToUpper()}");
+        Console.WriteLine($"  TIPO: {conta.GetType().Name} | SALDO: R$ {conta.Saldo:F2}");
+        Console.WriteLine("=================================================");
+        Console.WriteLine(" 1. Consultar Extrato");
+        Console.WriteLine(" 2. Realizar Depósito");
+        Console.WriteLine(" 3. Realizar Saque");
+        Console.WriteLine(" 4. Realizar Transferência");
+        Console.WriteLine(" 5. Pagar Conta / Fatura");
+        if (conta is ContaPoupanca)
+            Console.WriteLine(" 6. Aplicar Rendimento");
+        else if (conta is ContaEmpresarial)
+            Console.WriteLine(" 6. Solicitar Empréstimo");
+        Console.WriteLine(" 0. Sair da Conta");
+        Console.WriteLine("=================================================");
+        Console.Write("Escolha uma opção: ");
+
+        string? op = Console.ReadLine();
+        if (op == null)
+        {
+            break;
+        }
+        Console.WriteLine();
+
+        try
+        {
+            switch (op?.Trim())
+            {
+                case "1":
+                    conta.ExibirExtrato();
+                    break;
+                case "2":
+                    RealizarDeposito(conta);
+                    break;
+                case "3":
+                    RealizarSaque(conta);
+                    break;
+                case "4":
+                    RealizarTransferencia(banco, conta);
+                    break;
+                case "5":
+                    PagarFatura(conta);
+                    break;
+                case "6":
+                    if (conta is ContaPoupanca cp)
+                        AplicarRendimento(cp);
+                    else if (conta is ContaEmpresarial ce)
+                        SolicitarEmprestimo(ce);
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Opção não disponível para este tipo de conta.");
+                        Console.ResetColor();
+                    }
+                    break;
+                case "0":
+                    logado = false;
+                    Console.WriteLine("Sessão finalizada. Retornando ao menu principal...");
+                    break;
+                default:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Opção inválida!");
+                    Console.ResetColor();
+                    break;
+            }
+        }
+        catch (SaldoInsuficienteException ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n[ERRO DE SALDO] {ex.Message}");
+            Console.ResetColor();
+        }
+        catch (OperacaoBancariaException ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n[REGRA DE NEGÓCIO] {ex.Message}");
+            Console.ResetColor();
+        }
+        catch (ArgumentException ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"\n[DADO INVÁLIDO] {ex.Message}");
+            Console.ResetColor();
+        }
+        catch (FormatException)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("\n[FORMATO INVÁLIDO] O valor digitado precisa ser numérico.");
+            Console.ResetColor();
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine($"\n[ERRO INESPERADO] {ex.Message}");
+            Console.ResetColor();
+        }
+
+        if (logado)
+        {
+            AguardarTecla();
+        }
+    }
 }
 
 static void CadastrarNovaConta(Banco banco)
@@ -150,20 +252,9 @@ static void CadastrarNovaConta(Banco banco)
     Console.ResetColor();
 }
 
-static void ConsultarExtrato(Banco banco)
-{
-    Console.WriteLine("--- CONSULTA DE EXTRATO ---");
-    int numero = LerInteiro("Digite o número da conta: ");
-    ContaBancaria conta = banco.BuscarConta(numero);
-    conta.ExibirExtrato();
-}
-
-static void RealizarDeposito(Banco banco)
+static void RealizarDeposito(ContaBancaria conta)
 {
     Console.WriteLine("--- DEPÓSITO EM CONTA ---");
-    int numero = LerInteiro("Digite o número da conta: ");
-    ContaBancaria conta = banco.BuscarConta(numero);
-
     decimal valor = LerDecimal("Digite o valor a depositar: R$ ");
     conta.Depositar(valor);
 
@@ -173,12 +264,9 @@ static void RealizarDeposito(Banco banco)
     Console.ResetColor();
 }
 
-static void RealizarSaque(Banco banco)
+static void RealizarSaque(ContaBancaria conta)
 {
     Console.WriteLine("--- SAQUE BANCÁRIO ---");
-    int numero = LerInteiro("Digite o número da conta: ");
-    ContaBancaria conta = banco.BuscarConta(numero);
-
     decimal valor = LerDecimal("Digite o valor a sacar: R$ ");
     conta.Sacar(valor);
 
@@ -188,12 +276,10 @@ static void RealizarSaque(Banco banco)
     Console.ResetColor();
 }
 
-static void RealizarTransferencia(Banco banco)
+static void RealizarTransferencia(Banco banco, ContaBancaria origem)
 {
     Console.WriteLine("--- TRANSFERÊNCIA ENTRE CONTAS ---");
-    int numOrigem = LerInteiro("Digite o número da conta de ORIGEM: ");
-    ContaBancaria origem = banco.BuscarConta(numOrigem);
-
+    Console.WriteLine($"Conta de Origem: {origem.NumeroConta} ({origem.Titular})");
     int numDestino = LerInteiro("Digite o número da conta de DESTINO: ");
     ContaBancaria destino = banco.BuscarConta(numDestino);
 
@@ -201,53 +287,47 @@ static void RealizarTransferencia(Banco banco)
     origem.Transferir(valor, destino);
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"\nTransferência de R$ {valor:F2} realizada com sucesso!");
-    Console.WriteLine($"Conta de Origem ({origem.NumeroConta}) Saldo Atual: R$ {origem.Saldo:F2}");
-    Console.WriteLine($"Conta de Destino ({destino.NumeroConta}) Saldo Atual: R$ {destino.Saldo:F2}");
+    Console.WriteLine($"\nTransferência de R$ {valor:F2} para conta {destino.NumeroConta} ({destino.Titular}) realizada com sucesso!");
+    Console.WriteLine($"Seu Novo Saldo: R$ {origem.Saldo:F2}");
     Console.ResetColor();
 }
 
-static void AplicarRendimento(Banco banco)
+static void PagarFatura(ContaBancaria conta)
 {
-    Console.WriteLine("--- RENDIMENTO POUPANÇA ---");
-    int numero = LerInteiro("Digite o número da Conta Poupança: ");
-    ContaBancaria conta = banco.BuscarConta(numero);
+    Console.WriteLine("--- PAGAMENTO DE CONTA / FATURA ---");
+    Console.Write("Digite a descrição ou código de barras da fatura: ");
+    string descricao = Console.ReadLine()?.Trim() ?? string.Empty;
 
-    if (conta is ContaPoupanca cp)
-    {
-        decimal taxa = LerDecimal("Digite o percentual de rendimento a aplicar (ex: 0,5): ");
-        decimal rendimento = cp.AplicarRendimento(taxa);
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"\nRendimento de {taxa:F2}% aplicado! Ganho de R$ {rendimento:F2}. Novo Saldo: R$ {cp.Saldo:F2}");
-        Console.ResetColor();
-    }
-    else
-    {
-        throw new OperacaoBancariaException($"A conta {numero} é do tipo {conta.GetType().Name} e não suporta rendimento de poupança.");
-    }
+    decimal valor = LerDecimal("Digite o valor da fatura a pagar: R$ ");
+    conta.PagarConta(valor, descricao);
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"\nPagamento de '{descricao}' no valor de R$ {valor:F2} realizado com sucesso!");
+    Console.WriteLine($"Saldo restante na conta {conta.NumeroConta}: R$ {conta.Saldo:F2}");
+    Console.ResetColor();
 }
 
-static void SolicitarEmprestimo(Banco banco)
+static void AplicarRendimento(ContaPoupanca cp)
+{
+    Console.WriteLine("--- RENDIMENTO POUPANÇA ---");
+    decimal taxa = LerDecimal("Digite o percentual de rendimento a aplicar (ex: 0,5): ");
+    decimal rendimento = cp.AplicarRendimento(taxa);
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"\nRendimento de {taxa:F2}% aplicado! Ganho de R$ {rendimento:F2}. Novo Saldo: R$ {cp.Saldo:F2}");
+    Console.ResetColor();
+}
+
+static void SolicitarEmprestimo(ContaEmpresarial ce)
 {
     Console.WriteLine("--- EMPRÉSTIMO EMPRESARIAL ---");
-    int numero = LerInteiro("Digite o número da Conta Empresarial: ");
-    ContaBancaria conta = banco.BuscarConta(numero);
+    Console.WriteLine($"Limite atual de empréstimo disponível: R$ {ce.LimiteEmprestimo:F2}");
+    decimal valor = LerDecimal("Digite o valor do empréstimo desejado: R$ ");
+    ce.RealizarEmprestimo(valor);
 
-    if (conta is ContaEmpresarial ce)
-    {
-        Console.WriteLine($"Limite atual de empréstimo disponível: R$ {ce.LimiteEmprestimo:F2}");
-        decimal valor = LerDecimal("Digite o valor do empréstimo desejado: R$ ");
-        ce.RealizarEmprestimo(valor);
-
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"\nEmpréstimo de R$ {valor:F2} contratado com sucesso!");
-        Console.WriteLine($"Novo Saldo: R$ {ce.Saldo:F2} | Limite restante: R$ {ce.LimiteEmprestimo:F2}");
-        Console.ResetColor();
-    }
-    else
-    {
-        throw new OperacaoBancariaException($"A conta {numero} é do tipo {conta.GetType().Name} e não possui modalidade de empréstimo empresarial.");
-    }
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine($"\nEmpréstimo de R$ {valor:F2} contratado com sucesso!");
+    Console.WriteLine($"Novo Saldo: R$ {ce.Saldo:F2} | Limite restante: R$ {ce.LimiteEmprestimo:F2}");
+    Console.ResetColor();
 }
 
 static void ListarContas(Banco banco)
@@ -265,7 +345,6 @@ static void ListarContas(Banco banco)
 
     foreach (var conta in contas)
     {
-        // Demonstração de Polimorfismo: cada tipo de conta exibe seu extrato personalizado
         conta.ExibirExtrato();
     }
 
@@ -325,4 +404,29 @@ static decimal LerDecimal(string prompt)
         throw new FormatException("O valor fornecido não é um número decimal válido.");
     }
     return resultado;
+}
+
+static void LimparTela()
+{
+    try
+    {
+        Console.Clear();
+    }
+    catch (IOException)
+    {
+        // Ignora caso o ambiente/terminal não suporte limpeza de buffer (ex: saída redirecionada ou terminal integrado)
+    }
+}
+
+static void AguardarTecla()
+{
+    Console.WriteLine("\nPressione qualquer tecla para continuar...");
+    try
+    {
+        Console.ReadKey();
+    }
+    catch (InvalidOperationException)
+    {
+        Console.ReadLine();
+    }
 }

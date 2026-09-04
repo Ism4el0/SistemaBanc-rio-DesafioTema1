@@ -33,7 +33,7 @@ Projeto desenvolvido em C# (.NET 10) aplicando os conceitos fundamentais de **Pr
 
 ## 🏗️ Estrutura das Classes
 
-- **`ContaBancaria`** *(abstract)*: Classe base com dados do titular, saldo e operações de depósito e transferência.
+- **`ContaBancaria`** *(abstract)*: Classe base com dados do titular, saldo e operações de depósito, transferência e pagamento de contas/faturas.
 - **`ContaCorrente`**: Aplica taxa fixa por saque (R$ 5,00) e implementa a interface `ITributavel`.
 - **`ContaPoupanca`**: Isenta de taxas de saque e provê o método `AplicarRendimento(taxa)`.
 - **`ContaEmpresarial`**: Possui limite de crédito para empréstimos (`RealizarEmprestimo`).
@@ -45,19 +45,23 @@ Projeto desenvolvido em C# (.NET 10) aplicando os conceitos fundamentais de **Pr
 
 ---
 
-## 🖥️ Menu Interativo do Sistema
+## 🖥️ Menus do Sistema
 
-O sistema disponibiliza as seguintes opções no terminal:
-1. **Abrir Nova Conta** (Corrente, Poupança ou Empresarial)
-2. **Consultar Extrato de uma Conta**
-3. **Realizar Depósito**
-4. **Realizar Saque** (com validação de regras e taxas por tipo de conta)
-5. **Realizar Transferência entre Contas**
-6. **Aplicar Rendimento** (exclusivo Conta Poupança)
-7. **Solicitar Empréstimo** (exclusivo Conta Empresarial)
-8. **Listar Todas as Contas** (demonstração de polimorfismo)
-9. **Relatório de Tributos** (demonstração da interface `ITributavel`)
+### Menu Principal
+1. **Acessar Minha Conta (Login)** (Acesso à sessão da conta informando apenas o número)
+2. **Abrir Nova Conta** (Corrente, Poupança ou Empresarial)
+3. **Listar Todas as Contas** (Painel geral com demonstração de polimorfismo)
+4. **Relatório de Tributos** (Demonstração da interface `ITributavel`)
 0. **Sair**
+
+### Menu da Conta (Sessão do Usuário Logado)
+1. **Consultar Extrato** (Exibição detalhada de saldo e informações da conta)
+2. **Realizar Depósito**
+3. **Realizar Saque** (com validação de regras e taxas por tipo de conta)
+4. **Realizar Transferência entre Contas**
+5. **Pagar Conta / Fatura** (Débito direto do saldo com validações de negócio)
+6. **Operação Especial** (`Aplicar Rendimento` para Poupança / `Solicitar Empréstimo` para Empresarial)
+0. **Sair da Conta (Logout)**
 
 ---
 

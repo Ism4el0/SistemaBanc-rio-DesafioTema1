@@ -58,6 +58,26 @@ public abstract class ContaBancaria
     }
 
     /// <summary>
+    /// Realiza o pagamento de uma conta/fatura debitando diretamente do saldo da conta bancária.
+    /// </summary>
+    public virtual void PagarConta(decimal valor, string descricao)
+    {
+        if (valor <= 0)
+            throw new ArgumentException("O valor do pagamento deve ser maior que zero.");
+
+        if (string.IsNullOrWhiteSpace(descricao))
+            throw new ArgumentException("A descrição ou código da fatura deve ser informado.");
+
+        if (Saldo < valor)
+        {
+            throw new SaldoInsuficienteException(
+                $"Saldo insuficiente para pagar a fatura '{descricao}'! Valor: R$ {valor:F2} | Saldo disponível: R$ {Saldo:F2}.");
+        }
+
+        Saldo -= valor;
+    }
+
+    /// <summary>
     /// Exibe os dados e o saldo da conta no console.
     /// </summary>
     public virtual void ExibirExtrato()
