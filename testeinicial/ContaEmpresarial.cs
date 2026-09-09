@@ -25,10 +25,11 @@ public class ContaEmpresarial : ContaBancaria
         if (Saldo < valor)
         {
             throw new SaldoInsuficienteException(
-                $"Saldo insuficiente na Conta Empresarial {NumeroConta}! Tentativa de saque: R$ {valor:F2}. Saldo disponível: R$ {Saldo:F2}.");
+                $"Saldo insuficiente na Conta Empresarial {NumeroConta}! Tentativa de saque: R$ {valor:N2}. Saldo disponível: R$ {Saldo:N2}.");
         }
 
         Saldo -= valor;
+        RegistrarTransacao(TipoTransacao.Saque, valor, Saldo, "Saque empresarial");
         return true;
     }
 
@@ -43,18 +44,17 @@ public class ContaEmpresarial : ContaBancaria
         if (valor > LimiteEmprestimo)
         {
             throw new OperacaoBancariaException(
-                $"Empréstimo recusado para a Conta {NumeroConta}! Limite disponível: R$ {LimiteEmprestimo:F2}. Valor solicitado: R$ {valor:F2}.");
+                $"Empréstimo recusado para a Conta {NumeroConta}! Limite disponível: R$ {LimiteEmprestimo:N2}. Valor solicitado: R$ {valor:N2}.");
         }
 
         Saldo += valor;
         LimiteEmprestimo -= valor;
+        RegistrarTransacao(TipoTransacao.Emprestimo, valor, Saldo, $"Empréstimo contratado (Limite restante: R$ {LimiteEmprestimo:N2})");
         return true;
     }
 
-    public override void ExibirExtrato()
+    protected override void ExibirInformacoesEspecificas()
     {
-        base.ExibirExtrato();
-        Console.WriteLine($"Limite de Empréstimo Restante: R$ {LimiteEmprestimo:F2}");
-        Console.WriteLine("------------------------------------------");
+        Console.WriteLine($"Limite de Empréstimo Restante: R$ {LimiteEmprestimo:N2}");
     }
 }

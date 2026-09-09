@@ -27,11 +27,36 @@ public class ContaCorrente : ContaBancaria, ITributavel
         if (Saldo < totalDebito)
         {
             throw new SaldoInsuficienteException(
-                $"Saldo insuficiente na Conta Corrente {NumeroConta}! Saque solicitado: R$ {valor:F2} + Taxa: R$ {TaxaSaque:F2} (Total: R$ {totalDebito:F2}). Saldo disponível: R$ {Saldo:F2}.");
+                $"Saldo insuficiente na Conta Corrente {NumeroConta}! Saque solicitado: R$ {valor:N2} + Taxa: R$ {TaxaSaque:N2} (Total: R$ {totalDebito:N2}). Saldo disponível: R$ {Saldo:N2}.");
         }
 
         Saldo -= totalDebito;
+        RegistrarTransacao(TipoTransacao.Saque, valor, Saldo, $"Saque em dinheiro (Taxa aplicada: R$ {TaxaSaque:N2})");
         return true;
+    }
+
+    public override void Transferir(decimal valor, ContaBancaria contaDestino)
+    {
+        if (contaDestino == null)
+            throw new ArgumentNullException(nameof(contaDestino), "Conta de destino não informada.");
+
+        if (contaDestino.NumeroConta == this.NumeroConta)
+            throw new OperacaoBancariaException("A conta de destino não pode ser a mesma conta de origem.");
+
+        if (valor <= 0)
+            throw new ArgumentException("O valor de transferência deve ser maior que zero.");
+
+        decimal totalDebito = valor + TaxaSaque;
+
+        if (Saldo < totalDebito)
+        {
+            throw new SaldoInsuficienteException(
+                $"Saldo insuficiente na Conta Corrente {NumeroConta}! Transferência solicitada: R$ {valor:N2} + Taxa: R$ {TaxaSaque:N2} (Total: R$ {totalDebito:N2}). Saldo disponível: R$ {Saldo:N2}.");
+        }
+
+        Saldo -= totalDebito;
+        RegistrarTransacao(TipoTransacao.TransferenciaEnviada, valor, Saldo, $"Transf. para {contaDestino.Titular} (Conta {contaDestino.NumeroConta}) - Taxa: R$ {TaxaSaque:N2}");
+        contaDestino.ReceberTransferencia(valor, this);
     }
 
     /// <summary>
@@ -42,11 +67,9 @@ public class ContaCorrente : ContaBancaria, ITributavel
         return Saldo * 0.01m;
     }
 
-    public override void ExibirExtrato()
+    protected override void ExibirInformacoesEspecificas()
     {
-        base.ExibirExtrato();
-        Console.WriteLine($"Taxa por Saque: R$ {TaxaSaque:F2}");
-        Console.WriteLine($"Tributo Estimado (1% do saldo): R$ {CalcularTributo():F2}");
-        Console.WriteLine("------------------------------------------");
+        Console.WriteLine($"Taxa por Operação: R$ {TaxaSaque:N2}");
+        Console.WriteLine($"Tributo Estimado (1% do saldo): R$ {CalcularTributo():N2}");
     }
 }

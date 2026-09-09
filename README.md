@@ -33,15 +33,16 @@ Projeto desenvolvido em C# (.NET 10) aplicando os conceitos fundamentais de **Pr
 
 ## 🏗️ Estrutura das Classes
 
-- **`ContaBancaria`** *(abstract)*: Classe base com dados do titular, saldo e operações de depósito, transferência e pagamento de contas/faturas.
-- **`ContaCorrente`**: Aplica taxa fixa por saque (R$ 5,00) e implementa a interface `ITributavel`.
+- **`ContaBancaria`** *(abstract)*: Classe base com dados do titular, saldo, operações financeiras e histórico de transações via Template Method.
+- **`ContaCorrente`**: Aplica taxa por operação e implementa a interface `ITributavel`.
 - **`ContaPoupanca`**: Isenta de taxas de saque e provê o método `AplicarRendimento(taxa)`.
 - **`ContaEmpresarial`**: Possui limite de crédito para empréstimos (`RealizarEmprestimo`).
+- **`Transacao`** / **`TipoTransacao`**: Entidade e enumeração que armazenam o registro cronológico detalhado de cada movimentação (data/hora, tipo, valor, saldo pós-operação e descrição).
 - **`ITributavel`** *(interface)*: Contrato para cálculo de tributos sobre saldos/operações.
 - **`Banco`**: Gerenciador da coleção de contas, responsável por busca, total sob custódia e cálculo consolidado de tributos.
 - **`SaldoInsuficienteException`**: Exceção lançada quando uma tentativa de saque ou transferência ultrapassa o saldo disponível.
 - **`OperacaoBancariaException`**: Exceção de negócio para violações de limites ou regras bancárias.
-- **`Program.cs`**: Menu interativo em console com opções completas para o usuário.
+- **`Program.cs`**: Menu interativo em console configurado com cultura `pt-BR` (separador de milhar `.` e centavos `,`).
 
 ---
 
@@ -55,7 +56,7 @@ Projeto desenvolvido em C# (.NET 10) aplicando os conceitos fundamentais de **Pr
 0. **Sair**
 
 ### Menu da Conta (Sessão do Usuário Logado)
-1. **Consultar Extrato** (Exibição detalhada de saldo e informações da conta)
+1. **Consultar Extrato** (Exibição detalhada de saldo, informações da conta e histórico completo de transações em tabela)
 2. **Realizar Depósito**
 3. **Realizar Saque** (com validação de regras e taxas por tipo de conta)
 4. **Realizar Transferência entre Contas**

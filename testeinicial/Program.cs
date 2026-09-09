@@ -2,8 +2,12 @@ using System;
 using System.Globalization;
 using SistemaBancario;
 
-// Define a cultura padrão para formatação e leitura numérica
-CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
+// Define a cultura padrão (pt-BR) para formatação de moeda com pontos em mil e vírgula em centavos
+var culturaPtBr = new CultureInfo("pt-BR");
+CultureInfo.DefaultThreadCurrentCulture = culturaPtBr;
+CultureInfo.DefaultThreadCurrentUICulture = culturaPtBr;
+Thread.CurrentThread.CurrentCulture = culturaPtBr;
+Thread.CurrentThread.CurrentUICulture = culturaPtBr;
 
 Banco banco = new Banco("NuNu Banquinho");
 
@@ -121,9 +125,9 @@ static void MenuContaLogada(Banco banco, ContaBancaria conta)
         LimparTela();
         Console.WriteLine("=================================================");
         Console.WriteLine($"  CONTA: {conta.NumeroConta} | TITULAR: {conta.Titular.ToUpper()}");
-        Console.WriteLine($"  TIPO: {conta.GetType().Name} | SALDO: R$ {conta.Saldo:F2}");
+        Console.WriteLine($"  TIPO: {conta.GetType().Name} | SALDO: R$ {conta.Saldo:N2}");
         Console.WriteLine("=================================================");
-        Console.WriteLine(" 1. Consultar Extrato");
+        Console.WriteLine(" 1. Consultar Extrato (com Histórico)");
         Console.WriteLine(" 2. Realizar Depósito");
         Console.WriteLine(" 3. Realizar Saque");
         Console.WriteLine(" 4. Realizar Transferência");
@@ -259,8 +263,8 @@ static void RealizarDeposito(ContaBancaria conta)
     conta.Depositar(valor);
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"\nDepósito de R$ {valor:F2} realizado com sucesso!");
-    Console.WriteLine($"Novo saldo da conta {conta.NumeroConta}: R$ {conta.Saldo:F2}");
+    Console.WriteLine($"\nDepósito de R$ {valor:N2} realizado com sucesso!");
+    Console.WriteLine($"Novo saldo da conta {conta.NumeroConta}: R$ {conta.Saldo:N2}");
     Console.ResetColor();
 }
 
@@ -271,8 +275,8 @@ static void RealizarSaque(ContaBancaria conta)
     conta.Sacar(valor);
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"\nSaque de R$ {valor:F2} realizado com sucesso!");
-    Console.WriteLine($"Saldo restante na conta {conta.NumeroConta}: R$ {conta.Saldo:F2}");
+    Console.WriteLine($"\nSaque de R$ {valor:N2} realizado com sucesso!");
+    Console.WriteLine($"Saldo restante na conta {conta.NumeroConta}: R$ {conta.Saldo:N2}");
     Console.ResetColor();
 }
 
@@ -287,8 +291,8 @@ static void RealizarTransferencia(Banco banco, ContaBancaria origem)
     origem.Transferir(valor, destino);
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"\nTransferência de R$ {valor:F2} para conta {destino.NumeroConta} ({destino.Titular}) realizada com sucesso!");
-    Console.WriteLine($"Seu Novo Saldo: R$ {origem.Saldo:F2}");
+    Console.WriteLine($"\nTransferência de R$ {valor:N2} para conta {destino.NumeroConta} ({destino.Titular}) realizada com sucesso!");
+    Console.WriteLine($"Seu Novo Saldo: R$ {origem.Saldo:N2}");
     Console.ResetColor();
 }
 
@@ -302,8 +306,8 @@ static void PagarFatura(ContaBancaria conta)
     conta.PagarConta(valor, descricao);
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"\nPagamento de '{descricao}' no valor de R$ {valor:F2} realizado com sucesso!");
-    Console.WriteLine($"Saldo restante na conta {conta.NumeroConta}: R$ {conta.Saldo:F2}");
+    Console.WriteLine($"\nPagamento de '{descricao}' no valor de R$ {valor:N2} realizado com sucesso!");
+    Console.WriteLine($"Saldo restante na conta {conta.NumeroConta}: R$ {conta.Saldo:N2}");
     Console.ResetColor();
 }
 
@@ -313,20 +317,20 @@ static void AplicarRendimento(ContaPoupanca cp)
     decimal taxa = LerDecimal("Digite o percentual de rendimento a aplicar (ex: 0,5): ");
     decimal rendimento = cp.AplicarRendimento(taxa);
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"\nRendimento de {taxa:F2}% aplicado! Ganho de R$ {rendimento:F2}. Novo Saldo: R$ {cp.Saldo:F2}");
+    Console.WriteLine($"\nRendimento de {taxa:N2}% aplicado! Ganho de R$ {rendimento:N2}. Novo Saldo: R$ {cp.Saldo:N2}");
     Console.ResetColor();
 }
 
 static void SolicitarEmprestimo(ContaEmpresarial ce)
 {
     Console.WriteLine("--- EMPRÉSTIMO EMPRESARIAL ---");
-    Console.WriteLine($"Limite atual de empréstimo disponível: R$ {ce.LimiteEmprestimo:F2}");
+    Console.WriteLine($"Limite atual de empréstimo disponível: R$ {ce.LimiteEmprestimo:N2}");
     decimal valor = LerDecimal("Digite o valor do empréstimo desejado: R$ ");
     ce.RealizarEmprestimo(valor);
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"\nEmpréstimo de R$ {valor:F2} contratado com sucesso!");
-    Console.WriteLine($"Novo Saldo: R$ {ce.Saldo:F2} | Limite restante: R$ {ce.LimiteEmprestimo:F2}");
+    Console.WriteLine($"\nEmpréstimo de R$ {valor:N2} contratado com sucesso!");
+    Console.WriteLine($"Novo Saldo: R$ {ce.Saldo:N2} | Limite restante: R$ {ce.LimiteEmprestimo:N2}");
     Console.ResetColor();
 }
 
@@ -345,12 +349,12 @@ static void ListarContas(Banco banco)
 
     foreach (var conta in contas)
     {
-        conta.ExibirExtrato();
+        conta.ExibirExtrato(incluirHistorico: false);
     }
 
     Console.ForegroundColor = ConsoleColor.Cyan;
     Console.WriteLine($"Total de contas no sistema: {contas.Count}");
-    Console.WriteLine($"Total sob custódia do banco: R$ {banco.ObterTotalCustodia():F2}");
+    Console.WriteLine($"Total sob custódia do banco: R$ {banco.ObterTotalCustodia():N2}");
     Console.ResetColor();
 }
 
@@ -373,13 +377,13 @@ static void ExibirRelatorioTributos(Banco banco)
     {
         if (item is ContaBancaria cb)
         {
-            Console.WriteLine($"Conta: {cb.NumeroConta} | Titular: {cb.Titular} | Tributo Devido: R$ {item.CalcularTributo():F2}");
+            Console.WriteLine($"Conta: {cb.NumeroConta} | Titular: {cb.Titular} | Tributo Devido: R$ {item.CalcularTributo():N2}");
         }
     }
 
     Console.ForegroundColor = ConsoleColor.Cyan;
     Console.WriteLine("-------------------------------------------------");
-    Console.WriteLine($"Total de Tributos Arrecadados: R$ {banco.CalcularTotalTributos():F2}");
+    Console.WriteLine($"Total de Tributos Arrecadados: R$ {banco.CalcularTotalTributos():N2}");
     Console.ResetColor();
 }
 

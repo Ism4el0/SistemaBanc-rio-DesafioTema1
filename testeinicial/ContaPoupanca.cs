@@ -19,10 +19,11 @@ public class ContaPoupanca : ContaBancaria
         if (Saldo < valor)
         {
             throw new SaldoInsuficienteException(
-                $"Saldo insuficiente na Conta Poupança {NumeroConta}! Tentativa de saque: R$ {valor:F2}. Saldo disponível: R$ {Saldo:F2}.");
+                $"Saldo insuficiente na Conta Poupança {NumeroConta}! Tentativa de saque: R$ {valor:N2}. Saldo disponível: R$ {Saldo:N2}.");
         }
 
         Saldo -= valor;
+        RegistrarTransacao(TipoTransacao.Saque, valor, Saldo, "Saque em dinheiro");
         return true;
     }
 
@@ -36,13 +37,12 @@ public class ContaPoupanca : ContaBancaria
 
         decimal rendimento = Saldo * (taxaPercentual / 100m);
         Saldo += rendimento;
+        RegistrarTransacao(TipoTransacao.Rendimento, rendimento, Saldo, $"Rendimento de {taxaPercentual:N2}% aplicado");
         return rendimento;
     }
 
-    public override void ExibirExtrato()
+    protected override void ExibirInformacoesEspecificas()
     {
-        base.ExibirExtrato();
         Console.WriteLine("Benefício: Isenta de tarifas de saque");
-        Console.WriteLine("------------------------------------------");
     }
 }
