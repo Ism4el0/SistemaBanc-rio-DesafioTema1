@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using SistemaBancario;
 
-// Define a cultura padrão (pt-BR) para formatação de moeda com pontos em mil e vírgula em centavos
 var culturaPtBr = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentCulture = culturaPtBr;
 CultureInfo.DefaultThreadCurrentUICulture = culturaPtBr;
@@ -11,7 +10,6 @@ Thread.CurrentThread.CurrentUICulture = culturaPtBr;
 
 Banco banco = new Banco("NuNu Banquinho");
 
-// Inicialização com dados de demonstração
 InicializarDadosDemonstracao(banco);
 
 bool executando = true;
@@ -418,7 +416,6 @@ static void LimparTela()
     }
     catch (IOException)
     {
-        // Ignora caso o ambiente/terminal não suporte limpeza de buffer (ex: saída redirecionada ou terminal integrado)
     }
 }
 

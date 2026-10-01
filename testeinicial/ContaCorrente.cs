@@ -1,9 +1,4 @@
 namespace SistemaBancario;
-
-/// <summary>
-/// Representa uma Conta Corrente bancária.
-/// Possui taxa fixa por operação de saque e implementa a interface ITributavel.
-/// </summary>
 public class ContaCorrente : ContaBancaria, ITributavel
 {
     public decimal TaxaSaque { get; set; }
@@ -58,10 +53,6 @@ public class ContaCorrente : ContaBancaria, ITributavel
         RegistrarTransacao(TipoTransacao.TransferenciaEnviada, valor, Saldo, $"Transf. para {contaDestino.Titular} (Conta {contaDestino.NumeroConta}) - Taxa: R$ {TaxaSaque:N2}");
         contaDestino.ReceberTransferencia(valor, this);
     }
-
-    /// <summary>
-    /// Implementação da interface ITributavel: calcula 1% sobre o saldo como imposto sobre operações financeiras.
-    /// </summary>
     public decimal CalcularTributo()
     {
         return Saldo * 0.01m;

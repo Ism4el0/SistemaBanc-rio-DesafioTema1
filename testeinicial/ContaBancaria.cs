@@ -1,9 +1,4 @@
 namespace SistemaBancario;
-
-/// <summary>
-/// Classe abstrata base que representa uma conta bancária genérica.
-/// Aplica os conceitos de Abstração, Encapsulamento e base para Herança e Polimorfismo.
-/// </summary>
 public abstract class ContaBancaria
 {
     public int NumeroConta { get; private set; }
@@ -31,23 +26,12 @@ public abstract class ContaBancaria
             RegistrarTransacao(TipoTransacao.AberturaConta, saldoInicial, Saldo, "Depósito de abertura da conta");
         }
     }
-
-    /// <summary>
-    /// Retorna a lista de transações registradas na conta (somente leitura).
-    /// </summary>
     public IReadOnlyList<Transacao> ObterHistorico() => _historico.AsReadOnly();
 
-    /// <summary>
-    /// Registra uma nova movimentação financeira no histórico da conta.
-    /// </summary>
     protected void RegistrarTransacao(TipoTransacao tipo, decimal valor, decimal saldoApos, string descricao)
     {
         _historico.Add(new Transacao(tipo, valor, saldoApos, descricao));
     }
-
-    /// <summary>
-    /// Realiza o depósito de um valor na conta.
-    /// </summary>
     public virtual void Depositar(decimal valor)
     {
         if (valor <= 0)
@@ -56,15 +40,7 @@ public abstract class ContaBancaria
         Saldo += valor;
         RegistrarTransacao(TipoTransacao.Deposito, valor, Saldo, "Depósito em conta");
     }
-
-    /// <summary>
-    /// Método abstrato de saque que deve ser implementado pelas classes derivadas (Polimorfismo).
-    /// </summary>
     public abstract bool Sacar(decimal valor);
-
-    /// <summary>
-    /// Realiza a transferência de um valor para outra conta bancária.
-    /// </summary>
     public virtual void Transferir(decimal valor, ContaBancaria contaDestino)
     {
         if (contaDestino == null)
@@ -86,10 +62,6 @@ public abstract class ContaBancaria
         RegistrarTransacao(TipoTransacao.TransferenciaEnviada, valor, Saldo, $"Transferido para {contaDestino.Titular} (Conta {contaDestino.NumeroConta})");
         contaDestino.ReceberTransferencia(valor, this);
     }
-
-    /// <summary>
-    /// Credita valor transferido de outra conta bancária.
-    /// </summary>
     public virtual void ReceberTransferencia(decimal valor, ContaBancaria contaOrigem)
     {
         if (valor <= 0)
@@ -98,10 +70,6 @@ public abstract class ContaBancaria
         Saldo += valor;
         RegistrarTransacao(TipoTransacao.TransferenciaRecebida, valor, Saldo, $"Recebido de {contaOrigem.Titular} (Conta {contaOrigem.NumeroConta})");
     }
-
-    /// <summary>
-    /// Realiza o pagamento de uma conta/fatura debitando diretamente do saldo da conta bancária.
-    /// </summary>
     public virtual void PagarConta(decimal valor, string descricao)
     {
         if (valor <= 0)
@@ -119,17 +87,9 @@ public abstract class ContaBancaria
         Saldo -= valor;
         RegistrarTransacao(TipoTransacao.PagamentoFatura, valor, Saldo, $"Pagamento: {descricao}");
     }
-
-    /// <summary>
-    /// Hook virtual para classes filhas exibirem dados específicos (ex: taxas, limites).
-    /// </summary>
     protected virtual void ExibirInformacoesEspecificas()
     {
     }
-
-    /// <summary>
-    /// Exibe os dados, o saldo da conta e opcionalmente o histórico completo de transações.
-    /// </summary>
     public virtual void ExibirExtrato(bool incluirHistorico = true)
     {
         Console.WriteLine("--------------------------------------------------------------------------------");
@@ -143,10 +103,6 @@ public abstract class ContaBancaria
         }
         Console.WriteLine("--------------------------------------------------------------------------------");
     }
-
-    /// <summary>
-    /// Exibe no console a listagem formatada de todas as transações realizadas na conta.
-    /// </summary>
     public void ExibirHistoricoTransacoes()
     {
         Console.WriteLine("\n--- HISTÓRICO DE TRANSAÇÕES ---");

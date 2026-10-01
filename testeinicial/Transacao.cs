@@ -1,8 +1,4 @@
 namespace SistemaBancario;
-
-/// <summary>
-/// Tipos possíveis de movimentação financeira no histórico da conta.
-/// </summary>
 public enum TipoTransacao
 {
     AberturaConta,
@@ -14,10 +10,6 @@ public enum TipoTransacao
     Rendimento,
     Emprestimo
 }
-
-/// <summary>
-/// Representa uma transação registrada no histórico de uma conta bancária.
-/// </summary>
 public class Transacao
 {
     public DateTime DataHora { get; }
@@ -34,10 +26,6 @@ public class Transacao
         SaldoAposOperacao = saldoAposOperacao;
         Descricao = descricao;
     }
-
-    /// <summary>
-    /// Retorna uma descrição amigável do tipo da transação.
-    /// </summary>
     public string ObterNomeAmigavel() => Tipo switch
     {
         TipoTransacao.AberturaConta => "Abertura de Conta",

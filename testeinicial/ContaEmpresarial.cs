@@ -1,9 +1,4 @@
 namespace SistemaBancario;
-
-/// <summary>
-/// Representa uma Conta Empresarial (Pessoa Jurídica).
-/// Possui um limite específico para contratação de empréstimos.
-/// </summary>
 public class ContaEmpresarial : ContaBancaria
 {
     public decimal LimiteEmprestimo { get; private set; }
@@ -32,10 +27,6 @@ public class ContaEmpresarial : ContaBancaria
         RegistrarTransacao(TipoTransacao.Saque, valor, Saldo, "Saque empresarial");
         return true;
     }
-
-    /// <summary>
-    /// Contrata um empréstimo creditando o saldo e debitando o limite disponível.
-    /// </summary>
     public bool RealizarEmprestimo(decimal valor)
     {
         if (valor <= 0)

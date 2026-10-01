@@ -1,9 +1,4 @@
 namespace SistemaBancario;
-
-/// <summary>
-/// Representa uma Conta Poupança bancária.
-/// É isenta de taxas para saque e possui a operação de aplicar rendimento sobre o saldo.
-/// </summary>
 public class ContaPoupanca : ContaBancaria
 {
     public ContaPoupanca(int numeroConta, string titular, decimal saldoInicial)
@@ -26,10 +21,6 @@ public class ContaPoupanca : ContaBancaria
         RegistrarTransacao(TipoTransacao.Saque, valor, Saldo, "Saque em dinheiro");
         return true;
     }
-
-    /// <summary>
-    /// Aplica uma taxa percentual de rendimento sobre o saldo atual.
-    /// </summary>
     public decimal AplicarRendimento(decimal taxaPercentual)
     {
         if (taxaPercentual <= 0)
